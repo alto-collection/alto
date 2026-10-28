@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { StoryblokStory } from '@storyblok/react/rsc'
-import { AboutView, type AboutViewImages } from '@/components/about/about-view'
+import { AboutView } from '@/components/about/about-view'
 import { Footer } from '@/components/layout/footer'
 import { ApartmentsSection, getApartmentCards } from '@/components/sections/apartments-section'
 import { getServerLocale } from '@/lib/i18n/server'
+import { findNotreHistoireSection, getAboutViewImages } from '@/lib/storyblok-about-images'
 import { getStoryblokGlobals } from '@/lib/storyblok-globals'
 import { getStoryBySlug } from '@/lib/storyblok-page'
 import { defineSeoMetadata } from '@/lib/seo'
@@ -42,41 +43,18 @@ export default async function NotreHistoirePage() {
 
   return (
     <>
-      <AboutView siteImages={getFallbackAboutImages(globals.sharedAssets)} />
+      <AboutView
+        siteImages={getAboutViewImages(
+          globals.sharedAssets,
+          // Images are shared across locales: reuse the CMS assets on the English page.
+          findNotreHistoireSection(story?.content),
+          '/images/alto-salon.jpg',
+        )}
+      />
       <ApartmentsSection apartments={apartments} />
       <Footer />
     </>
   )
-}
-
-function getFallbackAboutImages(sharedAssets: {
-  locationAvatars: { src: string }[]
-  travelerAvatars: { src: string }[]
-}): AboutViewImages {
-  return {
-    shared: {
-      locationAvatars: [
-        sharedAssets.locationAvatars[0]?.src ?? '/images/blog-1.jpg',
-        sharedAssets.locationAvatars[1]?.src ?? '/images/hero-home.webp',
-        sharedAssets.locationAvatars[2]?.src ?? '/images/blog-3.jpg',
-      ],
-      travelerAvatars: [
-        sharedAssets.travelerAvatars[0]?.src ?? '/images/avatars/voyageur-1.png',
-        sharedAssets.travelerAvatars[1]?.src ?? '/images/avatars/voyageur-2.png',
-        sharedAssets.travelerAvatars[2]?.src ?? '/images/avatars/voyageur-3.png',
-      ],
-    },
-    about: {
-      conceptLounge: '/images/about/about-hero.webp',
-      conceptChair: '/images/alto-salon.jpg',
-      conceptCorridor: '/images/about/concept-corridor.jpg',
-      founders: {
-        paul: '/images/about/founder-paul.jpg',
-        mayeul: '/images/about/founder-mayeul.jpg',
-        benjamin: '/images/about/founder-benjamin.jpg',
-      },
-    },
-  }
 }
 
 const NOTRE_HISTOIRE_METADATA = {
